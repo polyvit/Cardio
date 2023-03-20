@@ -3,6 +3,7 @@
 // Elements
 const form = document.querySelector('.form');
 const formBtn = document.querySelector('.form__btn');
+const deleteBtn = document.querySelector('.delete_btn');
 const containerWorkouts = document.querySelector('.workouts');
 const inputType = document.querySelector('.form__input--type');
 const inputDistance = document.querySelector('.form__input--distance');
@@ -64,6 +65,7 @@ class App {
   constructor() {
     this._getPosition();
     formBtn.addEventListener('click', this._newWorkout.bind(this));
+    deleteBtn.addEventListener('click', this._deleteAll.bind(this));
     inputType.addEventListener('change', this._toggleClimbField.bind(this));
     containerWorkouts.addEventListener('click', this._moveToWorkout.bind(this));
     containerWorkouts.addEventListener('click', this._changeWorkout.bind(this));
@@ -230,7 +232,6 @@ class App {
   _getLSData() {
     const data = JSON.parse(localStorage.getItem('workouts'));
     if (!data) return;
-    console.log(data);
     this.#workouts = data;
     this.#workouts.forEach(workout => this._displayWorkoutOnSidebar(workout));
   }
@@ -246,17 +247,23 @@ class App {
   }
   _deleteWorkout(e) {
     if (e.target.classList.contains('cross')) {
-      // Удалить из массива и обновить LS
       const workoutElement = e.target.closest('.workout');
       const targetWorkout = this.#workouts.find(
         item => item.id === +workoutElement.dataset.id
       );
       this.#workouts.splice(this.#workouts.indexOf(targetWorkout), 1);
       this._addWorkoutsToLS();
-      // Удалить из sidebar и с карты
       workoutElement.remove();
       L.marker(targetWorkout.coords).closePopup().unbindPopup().remove();
     }
+  }
+  _deleteAll(e) {
+    e.preventDefault();
+    const allLines = containerWorkouts.querySelectorAll('li');
+    allLines.forEach(item => item.remove());
+    this.#workouts = [];
+    this._addWorkoutsToLS();
+    location.reload();
   }
 }
 
