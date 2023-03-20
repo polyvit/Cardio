@@ -232,7 +232,32 @@ class App {
   _getLSData() {
     const data = JSON.parse(localStorage.getItem('workouts'));
     if (!data) return;
-    this.#workouts = data;
+    data.forEach(obj => {
+      if (obj.type === 'running') {
+        const newObj = new Running(
+          obj.coords,
+          obj.distance,
+          obj.duration,
+          obj.temp
+        );
+        newObj.id = obj.id;
+        newObj.date = obj.date;
+        this.#workouts.push(newObj);
+      }
+      if (obj.type === 'cycling') {
+        const newObj = new Cycling(
+          obj.coords,
+          obj.distance,
+          obj.duration,
+          obj.climb
+        );
+        newObj.id = obj.id;
+        newObj.date = obj.date;
+        this.#workouts.push(newObj);
+      }
+    });
+    // this.#workouts = data;
+    console.log(this.#workouts);
     this.#workouts.forEach(workout => this._displayWorkoutOnSidebar(workout));
   }
   _changeWorkout(e) {
