@@ -66,6 +66,8 @@ class App {
     formBtn.addEventListener('click', this._newWorkout.bind(this));
     inputType.addEventListener('change', this._toggleClimbField.bind(this));
     containerWorkouts.addEventListener('click', this._moveToWorkout.bind(this));
+    containerWorkouts.addEventListener('click', this._changeWorkout.bind(this));
+    containerWorkouts.addEventListener('click', this._deleteWorkout.bind(this));
     this._getLSData();
   }
   _getPosition() {
@@ -161,6 +163,8 @@ class App {
     let html = `
         <li class="workout workout--${workout.type}" data-id="${workout.id}">
           <h2 class="workout__title">${workout.description}</h2>
+          <h3 class="change">Изменить</h3>
+          <div class="cross">x</div>
           <div class="workout__details">
             <span class="workout__icon">${
               workout.type === 'running' ? '🏃' : '🚵‍♂️'
@@ -186,7 +190,6 @@ class App {
             <span class="workout__value">${workout.temp}</span>
             <span class="workout__unit">шаг/мин</span>
           </div>
-          <button class="form__btn">Edit</button>
         </li>
       `;
     }
@@ -202,7 +205,6 @@ class App {
             <span class="workout__value">${workout.climb}</span>
             <span class="workout__unit">м</span>
           </div>
-          <button class="form__btn">Edit</button>
         </li>
       `;
     }
@@ -210,7 +212,12 @@ class App {
   }
   _moveToWorkout(e) {
     const workoutElement = e.target.closest('.workout');
-    if (!workoutElement) return;
+    if (
+      !workoutElement ||
+      e.target.classList.contains('cross') ||
+      e.target.classList.contains('change')
+    )
+      return;
     const targetWorkout = this.#workouts.find(
       item => item.id == workoutElement.dataset.id
     );
@@ -227,7 +234,30 @@ class App {
     this.#workouts = data;
     this.#workouts.forEach(workout => this._displayWorkoutOnSidebar(workout));
   }
-  _changeWorkoutData() {}
+  _changeWorkout(e) {
+    if (e.target.classList.contains('change')) {
+      // console.log('needs to be done');
+      // Определить тренировку
+      // Открыть форму
+      // Считать данные
+      // Обновить значения тренировки
+      // Перерисовать тренировку в сайдбаре
+    }
+  }
+  _deleteWorkout(e) {
+    if (e.target.classList.contains('cross')) {
+      // Удалить из массива и обновить LS
+      const workoutElement = e.target.closest('.workout');
+      const targetWorkout = this.#workouts.find(
+        item => item.id === +workoutElement.dataset.id
+      );
+      this.#workouts.splice(this.#workouts.indexOf(targetWorkout), 1);
+      this._addWorkoutsToLS();
+      // Удалить из sidebar и с карты
+      workoutElement.remove();
+      L.marker(targetWorkout.coords).closePopup().unbindPopup().remove();
+    }
+  }
 }
 
 const app = new App();
