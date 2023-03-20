@@ -178,6 +178,11 @@ a:visited {
   display: none;
 } */
 
+.delete_btn.hidden {
+
+  display: none;
+}
+
 .footer__copyright {
   margin-top: auto;
   font-size: 1.3rem;

@@ -211,6 +211,7 @@ class App {
       `;
     }
     containerWorkouts.insertAdjacentHTML('beforeend', html);
+    deleteBtn.classList.remove('hidden');
   }
   _moveToWorkout(e) {
     const workoutElement = e.target.closest('.workout');
@@ -280,6 +281,9 @@ class App {
       this._addWorkoutsToLS();
       workoutElement.remove();
       L.marker(targetWorkout.coords).closePopup().unbindPopup().remove();
+      if (containerWorkouts.querySelectorAll('li').length == 0) {
+        deleteBtn.classList.add('hidden');
+      }
     }
   }
   _deleteAll(e) {
@@ -288,6 +292,7 @@ class App {
     allLines.forEach(item => item.remove());
     this.#workouts = [];
     this._addWorkoutsToLS();
+    deleteBtn.classList.add('hidden');
     location.reload();
   }
 }
