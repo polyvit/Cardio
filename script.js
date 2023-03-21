@@ -10,6 +10,7 @@ const inputDistance = document.querySelector('.form__input--distance');
 const inputDuration = document.querySelector('.form__input--duration');
 const inputTemp = document.querySelector('.form__input--temp');
 const inputClimb = document.querySelector('.form__input--climb');
+const inputFilter = document.querySelector('.filter__input');
 
 // Code
 class Workout {
@@ -67,6 +68,7 @@ class App {
     formBtn.addEventListener('click', this._newWorkout.bind(this));
     deleteBtn.addEventListener('click', this._deleteAll.bind(this));
     inputType.addEventListener('change', this._toggleClimbField.bind(this));
+    inputFilter.addEventListener('change', this._filterWorkouts.bind(this));
     containerWorkouts.addEventListener('click', this._moveToWorkout.bind(this));
     containerWorkouts.addEventListener('click', this._changeWorkout.bind(this));
     containerWorkouts.addEventListener('click', this._deleteWorkout.bind(this));
@@ -212,6 +214,9 @@ class App {
     }
     containerWorkouts.insertAdjacentHTML('beforeend', html);
     deleteBtn.classList.remove('hidden');
+    if (containerWorkouts.querySelectorAll('li').length >= 2) {
+      inputFilter.classList.remove('hidden');
+    }
   }
   _moveToWorkout(e) {
     const workoutElement = e.target.closest('.workout');
@@ -258,19 +263,19 @@ class App {
       }
     });
     // this.#workouts = data;
-    console.log(this.#workouts);
     this.#workouts.forEach(workout => this._displayWorkoutOnSidebar(workout));
   }
   _changeWorkout(e) {
     if (e.target.classList.contains('change')) {
-      // console.log('needs to be done');
-      // Определить тренировку
-      // Открыть форму
-      // Считать данные
-      // Обновить значения тренировки
-      // Перерисовать тренировку в сайдбаре
+      // Определить, с какой тренировкой работаем, найти ее в массиве
+      // Сохранить ее айди и время
+      // Открыть форму с кнопкой "обновить"
+      // Считать данные после заполнения
+      // Создать новый объект тренировки, назначить ему старые время и айди, запушить его в массив
+      // Добавить после тренировки новую, а старую удалить
     }
   }
+  _updateWorkout() {}
   _deleteWorkout(e) {
     if (e.target.classList.contains('cross')) {
       const workoutElement = e.target.closest('.workout');
@@ -293,7 +298,26 @@ class App {
     this.#workouts = [];
     this._addWorkoutsToLS();
     deleteBtn.classList.add('hidden');
+    inputFilter.classList.add('hidden');
     location.reload();
+  }
+  _filterWorkouts() {
+    const filterBase = inputFilter.value;
+    containerWorkouts.querySelectorAll('li').forEach(li => li.remove());
+    this.#workouts.sort((prev, next) => {
+      switch (filterBase) {
+        case 'duration':
+          return prev.duration - next.duration;
+          break;
+        case 'distance':
+          return prev.distance - next.distance;
+          break;
+        case 'time':
+          return prev.date - next.date;
+          break;
+      }
+    });
+    this.#workouts.forEach(obj => this._displayWorkoutOnSidebar(obj));
   }
 }
 

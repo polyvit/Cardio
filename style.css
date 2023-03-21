@@ -168,6 +168,10 @@ a:visited {
   background-color: var(--color-light--3);
   transition: all 0.2s;
 }
+.filter__input {
+  padding: 0.1rem 1.1rem;
+  max-width: 150px;
+}
 
 .form__input:focus {
   outline: none;
@@ -177,9 +181,11 @@ a:visited {
 /* .form__btn {
   display: none;
 } */
+.delete_btn {
+  padding: 0.1rem 1.1rem;
+}
 
-.delete_btn.hidden {
-
+.delete_btn.hidden, .filter__input.hidden {
   display: none;
 }
 
