@@ -1,6 +1,7 @@
 'use strict';
 
 // Elements
+const sidebar = document.querySelector('.sidebar');
 const form = document.querySelector('.send_form');
 const updateForm = document.querySelector('.update_form');
 const formBtn = document.querySelector('.form__btn');
@@ -84,6 +85,7 @@ class App {
   #targetWorkout;
   constructor() {
     this._getPosition();
+    sidebar.addEventListener('click', this._closeForms.bind(this));
     formBtn.addEventListener('click', this._newWorkout.bind(this));
     // form.addEventListener('submit', this._newWorkout.bind(this));
     // updateForm.addEventListener('submit', this._updateWorkout.bind(this));
@@ -172,7 +174,7 @@ class App {
     }
     this.#workouts.push(workout);
     this._displayWorkout(workout, type);
-    this._displayWorkoutOnSidebar(workout, location);
+    this._displayWorkoutOnSidebar(workout);
     this._hideForm();
     this._addWorkoutsToLS();
   }
@@ -252,6 +254,7 @@ class App {
     }
   }
   _moveToWorkout(e) {
+    e.stopPropagation();
     const workoutElement = e.target.closest('.workout');
     if (
       !workoutElement ||
@@ -365,6 +368,7 @@ class App {
     }
   }
   _deleteWorkout(e) {
+    e.stopPropagation();
     if (e.target.classList.contains('cross')) {
       const workoutElement = e.target.closest('.workout');
       const targetWorkout = this.#workouts.find(
@@ -381,6 +385,7 @@ class App {
   }
   _deleteAll(e) {
     e.preventDefault();
+    e.stopPropagation();
     const allLines = containerWorkouts.querySelectorAll('li');
     allLines.forEach(item => item.remove());
     this.#workouts = [];
@@ -389,7 +394,8 @@ class App {
     inputFilter.classList.add('hidden');
     location.reload();
   }
-  _filterWorkouts() {
+  _filterWorkouts(e) {
+    e.stopPropagation();
     const filterBase = inputFilter.value;
     containerWorkouts.querySelectorAll('li').forEach(li => li.remove());
     this.#workouts.sort((prev, next) => {
@@ -406,6 +412,15 @@ class App {
       }
     });
     this.#workouts.forEach(obj => this._displayWorkoutOnSidebar(obj));
+  }
+  _closeForms(e) {
+    if (e.target.classList.contains('sidebar')) {
+      e.target.querySelectorAll('.form').forEach(form => {
+        if (!form.classList.contains('hidden')) {
+          form.classList.add('hidden');
+        }
+      });
+    }
   }
 }
 
