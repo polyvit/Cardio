@@ -302,8 +302,22 @@ class App {
         item => item.id === +this.#currentElement.dataset.id
       );
       updateForm.classList.remove('hidden');
+      // Подставляем имеющиеся значения в форму
+      inputChangeType.value = this.#targetWorkout.type;
       inputChangeDuration.value = this.#targetWorkout.duration;
       inputChangeDistance.value = this.#targetWorkout.distance;
+      if (this.#targetWorkout.type === 'running') {
+        inputChangeTemp.value = this.#targetWorkout.temp;
+      }
+      if (this.#targetWorkout.type === 'cycling') {
+        inputChangeClimb
+          .closest('.form__row')
+          .classList.toggle('form__row--hidden');
+        inputChangeTemp
+          .closest('.form__row')
+          .classList.toggle('form__row--hidden');
+        inputChangeClimb.value = this.#targetWorkout.climb;
+      }
     }
   }
   _updateWorkout(e) {
