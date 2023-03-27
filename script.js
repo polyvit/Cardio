@@ -13,6 +13,21 @@ const inputDuration = document.querySelector('.form__input--duration');
 const inputTemp = document.querySelector('.form__input--temp');
 const inputClimb = document.querySelector('.form__input--climb');
 const inputFilter = document.querySelector('.filter__input');
+const inputChangeType = document.querySelector(
+  '.update_form .form__input--type'
+);
+const inputChangeDistance = document.querySelector(
+  '.update_form .form__input--distance'
+);
+const inputChangeDuration = document.querySelector(
+  '.update_form .form__input--duration'
+);
+const inputChangeTemp = document.querySelector(
+  '.update_form .form__input--temp'
+);
+const inputChangeClimb = document.querySelector(
+  '.update_form .form__input--climb'
+);
 
 // Code
 class Workout {
@@ -65,10 +80,14 @@ class App {
   #map;
   #mapEvent;
   #workouts = [];
+  #currentElement;
+  #targetWorkout;
   constructor() {
     this._getPosition();
-    // formBtn.addEventListener('click', this._newWorkout.bind(this));
-    form.addEventListener('submit', this._newWorkout.bind(this));
+    formBtn.addEventListener('click', this._newWorkout.bind(this));
+    // form.addEventListener('submit', this._newWorkout.bind(this));
+    // updateForm.addEventListener('submit', this._updateWorkout.bind(this));
+    updateBtn.addEventListener('click', this._updateWorkout.bind(this));
     deleteBtn.addEventListener('click', this._deleteAll.bind(this));
     inputType.addEventListener('change', this._toggleClimbField.bind(this));
     inputFilter.addEventListener('change', this._filterWorkouts.bind(this));
@@ -115,13 +134,19 @@ class App {
     inputClimb.closest('.form__row').classList.toggle('form__row--hidden');
     inputTemp.closest('.form__row').classList.toggle('form__row--hidden');
   }
+  _areNumbers(...numbers) {
+    return numbers.every(num => Number.isFinite(num));
+  }
+  _areNumbersPositive(...numbers) {
+    return numbers.every(num => num > 0);
+  }
   _newWorkout(e) {
     e.preventDefault();
     const { lat, lng } = this.#mapEvent.latlng;
+    // const areNumbers = (...numbers) =>
+    //   numbers.every(num => Number.isFinite(num));
+    // const areNumbersPositive = (...numbers) => numbers.every(num => num > 0);
     let workout;
-    const areNumbers = (...numbers) =>
-      numbers.every(num => Number.isFinite(num));
-    const areNumbersPositive = (...numbers) => numbers.every(num => num > 0);
     // Form data
     const type = inputType.value;
     const distance = +inputDistance.value;
@@ -130,8 +155,8 @@ class App {
     if (type === 'running') {
       const temp = +inputTemp.value;
       if (
-        !areNumbers(distance, duration, temp) ||
-        !areNumbersPositive(distance, duration, temp)
+        !this._areNumbers(distance, duration, temp) ||
+        !this._areNumbersPositive(distance, duration, temp)
       )
         return alert('Введите положительное число');
       workout = new Running([lat, lng], distance, duration, temp);
@@ -139,8 +164,8 @@ class App {
     if (type === 'cycling') {
       const climb = +inputClimb.value;
       if (
-        !areNumbers(distance, duration, climb) ||
-        !areNumbersPositive(distance, duration)
+        !this._areNumbers(distance, duration, climb) ||
+        !this._areNumbersPositive(distance, duration)
       )
         return alert('Введите положительное число');
       workout = new Cycling([lat, lng], distance, duration, climb);
@@ -270,15 +295,56 @@ class App {
     this.#workouts.forEach(workout => this._displayWorkoutOnSidebar(workout));
   }
   _changeWorkout(e) {
+    e.stopPropagation();
     if (e.target.classList.contains('change')) {
-      // Определить, с какой тренировкой работаем, найти ее в массиве
-      // Сохранить ее айди и время
-      // Открыть форму с кнопкой "обновить"
-      // Создать новый объект тренировки, назначить ему старые время и айди, запушить его в массив
-      // Добавить после тренировки новую, а старую удалить
+      this.#currentElement = e.target.closest('.workout');
+      this.#targetWorkout = this.#workouts.find(
+        item => item.id === +this.#currentElement.dataset.id
+      );
+      updateForm.classList.remove('hidden');
+      inputChangeDuration.value = this.#targetWorkout.duration;
+      inputChangeDistance.value = this.#targetWorkout.distance;
     }
   }
-  _updateWorkout(e) {}
+  _updateWorkout(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.target.classList.contains('update__btn')) {
+      // Считать данные и подставить их в тренировку
+      const type = inputChangeType.value;
+      const distance = +inputChangeDistance.value;
+      this.#targetWorkout.distance = distance;
+      const duration = +inputChangeDuration.value;
+      this.#targetWorkout.duration = duration;
+      if (type === 'running') {
+        const temp = +inputChangeTemp.value;
+        this.#targetWorkout.temp = temp;
+        this.#targetWorkout.pace = duration / distance;
+        if (
+          !this._areNumbers(distance, duration, temp) ||
+          !this._areNumbersPositive(distance, duration, temp)
+        )
+          return alert('Введите положительное число');
+      }
+      if (type === 'cycling') {
+        const climb = +inputChangeClimb.value;
+        this.#targetWorkout.climb = climb;
+        this.#targetWorkout.speed = distance / duration / 60;
+        if (
+          !this._areNumbers(distance, duration, climb) ||
+          !this._areNumbersPositive(distance, duration)
+        )
+          return alert('Введите положительное число');
+      }
+      // Изменить LS
+      this._addWorkoutsToLS();
+      // Перерисовать sidebar
+      this.#currentElement.remove();
+      this._displayWorkoutOnSidebar(this.#targetWorkout);
+      // Скрыть форму
+      updateForm.classList.add('hidden');
+    }
+  }
   _deleteWorkout(e) {
     if (e.target.classList.contains('cross')) {
       const workoutElement = e.target.closest('.workout');
