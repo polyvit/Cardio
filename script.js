@@ -1,9 +1,11 @@
 'use strict';
 
 // Elements
-const form = document.querySelector('.form');
+const form = document.querySelector('.send_form');
+const updateForm = document.querySelector('.update_form');
 const formBtn = document.querySelector('.form__btn');
 const deleteBtn = document.querySelector('.delete_btn');
+const updateBtn = document.querySelector('.update__btn');
 const containerWorkouts = document.querySelector('.workouts');
 const inputType = document.querySelector('.form__input--type');
 const inputDistance = document.querySelector('.form__input--distance');
@@ -65,7 +67,8 @@ class App {
   #workouts = [];
   constructor() {
     this._getPosition();
-    formBtn.addEventListener('click', this._newWorkout.bind(this));
+    // formBtn.addEventListener('click', this._newWorkout.bind(this));
+    form.addEventListener('submit', this._newWorkout.bind(this));
     deleteBtn.addEventListener('click', this._deleteAll.bind(this));
     inputType.addEventListener('change', this._toggleClimbField.bind(this));
     inputFilter.addEventListener('change', this._filterWorkouts.bind(this));
@@ -238,31 +241,32 @@ class App {
   _getLSData() {
     const data = JSON.parse(localStorage.getItem('workouts'));
     if (!data) return;
-    data.forEach(obj => {
-      if (obj.type === 'running') {
-        const newObj = new Running(
-          obj.coords,
-          obj.distance,
-          obj.duration,
-          obj.temp
-        );
-        newObj.id = obj.id;
-        newObj.date = obj.date;
-        this.#workouts.push(newObj);
-      }
-      if (obj.type === 'cycling') {
-        const newObj = new Cycling(
-          obj.coords,
-          obj.distance,
-          obj.duration,
-          obj.climb
-        );
-        newObj.id = obj.id;
-        newObj.date = obj.date;
-        this.#workouts.push(newObj);
-      }
-    });
-    // this.#workouts = data;
+    // data.forEach(obj => {
+    //   if (obj.type === 'running') {
+    //     const newObj = new Running(
+    //       obj.coords,
+    //       obj.distance,
+    //       obj.duration,
+    //       obj.temp
+    //     );
+    //     newObj.id = obj.id;
+    //     newObj.date = obj.date;
+    //     this.#workouts.push(newObj);
+    //   }
+    //   if (obj.type === 'cycling') {
+    //     const newObj = new Cycling(
+    //       obj.coords,
+    //       obj.distance,
+    //       obj.duration,
+    //       obj.climb
+    //     );
+    //     newObj.id = obj.id;
+    //     newObj.date = obj.date;
+    //     this.#workouts.push(newObj);
+    //   }
+    // });
+    // console.log(this.#workouts);
+    this.#workouts = data;
     this.#workouts.forEach(workout => this._displayWorkoutOnSidebar(workout));
   }
   _changeWorkout(e) {
@@ -270,12 +274,11 @@ class App {
       // Определить, с какой тренировкой работаем, найти ее в массиве
       // Сохранить ее айди и время
       // Открыть форму с кнопкой "обновить"
-      // Считать данные после заполнения
       // Создать новый объект тренировки, назначить ему старые время и айди, запушить его в массив
       // Добавить после тренировки новую, а старую удалить
     }
   }
-  _updateWorkout() {}
+  _updateWorkout(e) {}
   _deleteWorkout(e) {
     if (e.target.classList.contains('cross')) {
       const workoutElement = e.target.closest('.workout');
