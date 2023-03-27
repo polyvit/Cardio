@@ -172,7 +172,7 @@ class App {
     }
     this.#workouts.push(workout);
     this._displayWorkout(workout, type);
-    this._displayWorkoutOnSidebar(workout);
+    this._displayWorkoutOnSidebar(workout, location);
     this._hideForm();
     this._addWorkoutsToLS();
   }
@@ -191,7 +191,7 @@ class App {
       )
       .openPopup();
   }
-  _displayWorkoutOnSidebar(workout) {
+  _displayWorkoutOnSidebar(workout, type = 'add') {
     let html = `
         <li class="workout workout--${workout.type}" data-id="${workout.id}">
           <h2 class="workout__title">${workout.description}</h2>
@@ -240,7 +240,12 @@ class App {
         </li>
       `;
     }
-    containerWorkouts.insertAdjacentHTML('beforeend', html);
+    if (type === 'add') {
+      containerWorkouts.insertAdjacentHTML('beforeend', html);
+    }
+    if (type == 'update') {
+      this.#currentElement.insertAdjacentHTML('afterend', html);
+    }
     deleteBtn.classList.remove('hidden');
     if (containerWorkouts.querySelectorAll('li').length >= 2) {
       inputFilter.classList.remove('hidden');
@@ -353,8 +358,8 @@ class App {
       // Изменить LS
       this._addWorkoutsToLS();
       // Перерисовать sidebar
+      this._displayWorkoutOnSidebar(this.#targetWorkout, 'update');
       this.#currentElement.remove();
-      this._displayWorkoutOnSidebar(this.#targetWorkout);
       // Скрыть форму
       updateForm.classList.add('hidden');
     }
