@@ -2,6 +2,8 @@
 
 // Elements
 const sidebar = document.querySelector('.sidebar');
+const modal = document.querySelector('.modal-warning');
+const closeModalBtn = document.querySelector('.modal-close');
 const form = document.querySelector('.send_form');
 const updateForm = document.querySelector('.update_form');
 const formBtn = document.querySelector('.form__btn');
@@ -102,9 +104,7 @@ class App {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         this._loadMap.bind(this),
-        function () {
-          console.log('Неудача');
-        }
+        this._showWarning.bind(this)
       );
     }
   }
@@ -421,6 +421,13 @@ class App {
         }
       });
     }
+  }
+  _showWarning() {
+    modal.style.display = 'block';
+    closeModalBtn.addEventListener('click', function () {
+      modal.style.display = 'none';
+      location.reload();
+    });
   }
 }
 
