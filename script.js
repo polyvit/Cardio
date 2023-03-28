@@ -34,16 +34,19 @@ const inputChangeClimb = document.querySelector(
 
 // Code
 class Workout {
-  date = new Date();
+  // date = new Date();
   id = new Date().getTime();
   clickNumber = 0;
-  constructor(coords, distance, duration) {
+  constructor(coords, distance, duration, date = new Date()) {
     this.coords = coords;
     this.distance = distance;
     this.duration = duration;
+    this.date = date;
   }
   _setDescription() {
-    const workoutDate = `${new Intl.DateTimeFormat('ru-Ru').format(this.date)}`;
+    const workoutDate = `${new Intl.DateTimeFormat('ru-Ru').format(
+      new Date(this.date)
+    )}`;
     this.type === 'running'
       ? (this.description = `Пробежка ${workoutDate}`)
       : (this.description = `Велотренировка ${workoutDate}`);
@@ -55,8 +58,8 @@ class Workout {
 
 class Running extends Workout {
   type = 'running';
-  constructor(coords, distance, duration, temp) {
-    super(coords, distance, duration);
+  constructor(coords, distance, duration, temp, date) {
+    super(coords, distance, duration, date);
     this.temp = temp;
     this.calculatePace();
     this._setDescription();
@@ -68,8 +71,8 @@ class Running extends Workout {
 
 class Cycling extends Workout {
   type = 'cycling';
-  constructor(coords, distance, duration, climb) {
-    super(coords, distance, duration);
+  constructor(coords, distance, duration, climb, date) {
+    super(coords, distance, duration, date);
     this.climb = climb;
     this.calculateSpeed();
     this._setDescription();
@@ -274,32 +277,31 @@ class App {
   _getLSData() {
     const data = JSON.parse(localStorage.getItem('workouts'));
     if (!data) return;
-    // data.forEach(obj => {
-    //   if (obj.type === 'running') {
-    //     const newObj = new Running(
-    //       obj.coords,
-    //       obj.distance,
-    //       obj.duration,
-    //       obj.temp
-    //     );
-    //     newObj.id = obj.id;
-    //     newObj.date = obj.date;
-    //     this.#workouts.push(newObj);
-    //   }
-    //   if (obj.type === 'cycling') {
-    //     const newObj = new Cycling(
-    //       obj.coords,
-    //       obj.distance,
-    //       obj.duration,
-    //       obj.climb
-    //     );
-    //     newObj.id = obj.id;
-    //     newObj.date = obj.date;
-    //     this.#workouts.push(newObj);
-    //   }
-    // });
-    // console.log(this.#workouts);
-    this.#workouts = data;
+    data.forEach(obj => {
+      if (obj.type === 'running') {
+        const newObj = new Running(
+          obj.coords,
+          obj.distance,
+          obj.duration,
+          obj.temp,
+          obj.date
+        );
+        newObj.id = obj.id;
+        this.#workouts.push(newObj);
+      }
+      if (obj.type === 'cycling') {
+        const newObj = new Cycling(
+          obj.coords,
+          obj.distance,
+          obj.duration,
+          obj.climb,
+          obj.date
+        );
+        newObj.id = obj.id;
+        this.#workouts.push(newObj);
+      }
+    });
+    // this.#workouts = data;
     this.#workouts.forEach(workout => this._displayWorkoutOnSidebar(workout));
   }
   _changeWorkout(e) {
